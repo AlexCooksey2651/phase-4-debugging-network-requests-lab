@@ -63,11 +63,23 @@ developing your own process.
 - Add a new toy when the toy form is submitted
 
   - How I debugged:
+  When I first submitted the form, Chrome's devtools showed a status: 500 internal server error for the post request. The exception raised showed; `<NameError: uninitialized constant ToysController::Toys>`. Examining the `create` method in the `toys_controller`, I noticed a typo where the variable `toy` is being created as an instance of the `Toys` class. Our class name should be singular - i.e. the class should be `Toy` rather than `Toys` (this is reflected in the `Toy` model also).
+
+  Correcting this typo within the `create` method fixed the issue.  
 
 - Update the number of likes for a toy
 
   - How I debugged:
+    First, I went into the browswer devtools in Chrome under the network page to inspect the request. It showed a 204 status, with no content; the console also showed an error message of "Syntax Error: Unexpected end of JSON input." This made me want to make sure JSON was being returned. 
+
+    In the update route for in the toys_controller, the toy was being updated using the `update` method, but nothing was being rendered. I put in a conditional statement that either rendered the toy as json, or (if the toy was not found) returned an error message of "Toy not found". This yielded a status 200 and a proper response. 
 
 - Donate a toy to Goodwill (and delete it from our database)
 
-  - How I debugged:
+  - How I debugged: When the Donate button was initially clicked, the network page on the Chrome devtools showed a status 404 error, suggesting a client side error. The console showed an error that the DELETE request made to the specified URL was not found. 
+
+  I inspected the existing routes in config/routes.rb, and found that the routes included for toys only included index, create, and update. Once `:destroy` was added to the array of included routes, the issue was resolved. 
+
+
+
+
